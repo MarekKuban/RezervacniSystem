@@ -65,7 +65,7 @@ public class JazykyService {
     // 3. Kontrola existující registrace - přijímá objekt Uzivatel
     public Registrace ziskatRegistraciUzivatele(Uzivatel uzivatel) {
         List<Registrace> registrace = registraceRepository.findByUzivatel(uzivatel);
-        return registrace.isEmpty() ? null : registrace.get(0);
+        return registrace.isEmpty() ? null : registrace.getFirst();
     }
 
     // 4. Vytvoření registrace
