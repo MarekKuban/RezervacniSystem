@@ -27,23 +27,33 @@ public class JazykyService {
     // 1. Přihlášení - vrací objekt Uzivatel
     // Upravená metoda přijímá 3 parametry
     public Uzivatel prihlasitUzivatele(String rodneCislo, String zadaneJmeno, String zadanePrijmeni) {
-        // 1. Najdeme uživatele podle RČ (to je unikátní klíč)
-        Uzivatel uzivatel = uzivatelRepository.findByRodneCislo(rodneCislo).orElse(null);
+        // --- START ÚPRAVY ---
+        // 1. Normalizace RČ: Vyhodíme vše, co není číslo (mezery, lomítka, tečky...)
+        String cisteRC = rodneCislo.replaceAll("[^0-9]", "");
 
-        // 2. Pokud uživatel neexistuje, vrátíme null
+        // 2. Pokud má správnou délku (10 čísel), vložíme lomítko na správné místo
+        // Očekáváme formát v DB: XXXXXX/XXXX
+        String formatovaneRC = rodneCislo; // Defaultně necháme původní
+
+        if (cisteRC.length() == 10) {
+            formatovaneRC = cisteRC.substring(0, 6) + "/" + cisteRC.substring(6);
+        }
+        // --- KONEC ÚPRAVY ---
+
+        // Teď hledáme v DB už to opravené RČ s lomítkem
+        Uzivatel uzivatel = uzivatelRepository.findByRodneCislo(formatovaneRC).orElse(null);
+
         if (uzivatel == null) {
             return null;
         }
 
-        // 3. Pokud existuje, zkontrolujeme Jméno a Příjmení
-        // (Ignorujeme velikost písmen a mezery na začátku/konci)
         boolean jmenoSedi = uzivatel.getJmeno().trim().equalsIgnoreCase(zadaneJmeno.trim());
         boolean prijmeniSedi = uzivatel.getPrijmeni().trim().equalsIgnoreCase(zadanePrijmeni.trim());
 
         if (jmenoSedi && prijmeniSedi) {
-            return uzivatel; // Všechno sedí, pouštíme ho
+            return uzivatel;
         } else {
-            return null; // RČ sice sedí, ale jméno ne -> nepustíme ho (bezpečnost)
+            return null;
         }
     }
 

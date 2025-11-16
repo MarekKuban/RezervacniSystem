@@ -33,18 +33,38 @@
 
         <div class="mb-3">
             <label class="form-label fw-bold">Rodné číslo</label>
-            <label>
-                <input type="text" name="rodneCislo" class="form-control" placeholder="RRMMDD/XXXX" required>
-            </label>
+            <input type="text"
+                   id="rcInput"
+                   name="rodneCislo"
+                   class="form-control form-control-lg"
+                   placeholder="RRMMDD/XXXX"
+                   maxlength="11"
+                   required>
+            <div class="form-text">Lomítko se doplní automaticky.</div>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Vstoupit do systému</button>
+        <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Přihlásit se</button>
     </form>
-
-    <div class="mt-3 text-center text-muted" style="font-size: 0.8em;">
-        <p>V případě problémů s přihlášením kontaktujte správce sítě.</p>
-    </div>
 </div>
+
+<script>
+    const input = document.getElementById('rcInput');
+
+    input.addEventListener('input', function (e) {
+        let value = e.target.value;
+
+        // 1. Odstraníme všechno, co není číslo (kdyby tam zkoušeli psát písmena)
+        value = value.replace(/\D/g, '');
+
+        // 2. Pokud je delší než 6 znaků, přidáme za 6. znak lomítko
+        if (value.length > 6) {
+            value = value.slice(0, 6) + '/' + value.slice(6, 10);
+        }
+
+        // 3. Vrátíme upravenou hodnotu zpět do políčka
+        e.target.value = value;
+    });
+</script>
 
 </body>
 </html>
