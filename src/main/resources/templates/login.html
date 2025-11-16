@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>Přihlášení - Volba jazyka</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center" style="height: 100vh;">
+
+<div class="card shadow-lg p-4 border-0" style="max-width: 400px; width: 100%;">
+    <div class="text-center mb-4">
+        <h1>🏫</h1>
+        <h3>Volba 2. cizího jazyka</h3>
+        <p class="text-muted">Zadejte své rodné číslo pro vstup</p>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}"></div>
+
+    <form action="/login" method="post">
+        <div class="mb-3">
+            <label class="form-label fw-bold">Jméno</label>
+            <input type="text" name="jmeno" class="form-control" placeholder="Např. Jan" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Příjmení</label>
+            <input type="text" name="prijmeni" class="form-control" placeholder="Např. Novák" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Rodné číslo</label>
+            <input type="text" name="rodneCislo" class="form-control" placeholder="RRMMDD/XXXX" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Vstoupit do systému</button>
+    </form>
+
+    <div class="mt-3 text-center text-muted" style="font-size: 0.8em;">
+        <p>V případě problémů s přihlášením kontaktujte správce sítě.</p>
+    </div>
+</div>
+
+</body>
+</html>
