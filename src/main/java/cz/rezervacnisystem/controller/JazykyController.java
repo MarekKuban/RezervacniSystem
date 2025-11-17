@@ -28,7 +28,10 @@ public class JazykyController {
     }
 
     @GetMapping("/")
-    public String showLogin() {
+    public String showLogin(Model model) {
+        if (!model.containsAttribute("error")) {
+            model.addAttribute("error", null);
+        }
         return "login";
     }
 
@@ -69,7 +72,11 @@ public class JazykyController {
     @GetMapping("/vyber")
     public String showVyberJazyka(HttpSession session, Model model) {
         Student student = (Student) session.getAttribute("prihlasenyStudent");
-        if (student == null) return "redirect:/";
+
+        if (student == null) {
+            if (session.getAttribute("adminLogged") != null) return "redirect:/admin/dashboard";
+            return "redirect:/";
+        }
 
         List<Jazyk> jazyky = service.ziskatVsechnyJazyky();
         Registrace existujiciVolba = service.ziskatRegistraciStudenta(student);
@@ -77,6 +84,14 @@ public class JazykyController {
         model.addAttribute("student", student);
         model.addAttribute("jazyky", jazyky);
         model.addAttribute("mojeVolba", existujiciVolba);
+
+        if (!model.containsAttribute("success")) {
+            model.addAttribute("success", null);
+        }
+        if (!model.containsAttribute("error")) {
+            model.addAttribute("error", null);
+        }
+
 
         return "vyber";
     }
