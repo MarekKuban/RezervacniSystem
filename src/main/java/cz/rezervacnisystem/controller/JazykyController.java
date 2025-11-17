@@ -2,7 +2,7 @@ package cz.rezervacnisystem.controller;
 
 import cz.rezervacnisystem.model.Jazyk;
 import cz.rezervacnisystem.model.Registrace;
-import cz.rezervacnisystem.model.Uzivatel;
+import cz.rezervacnisystem.model.Student;
 import cz.rezervacnisystem.service.JazykyService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -19,6 +19,10 @@ public class JazykyController {
 
     private final JazykyService service;
 
+    private static final String ADMIN_RC = "000000/0000";
+    private static final String ADMIN_JMENO = "Admin";
+    private static final String ADMIN_PRIJMENI = "Admin";
+
     public JazykyController(JazykyService service) {
         this.service = service;
     }
@@ -30,57 +34,64 @@ public class JazykyController {
 
     @PostMapping("/login")
     public String processLogin(
-            @RequestParam String jmeno,      // <--- Nové
-            @RequestParam String prijmeni,   // <--- Nové
+            @RequestParam String jmeno,
+            @RequestParam String prijmeni,
             @RequestParam String rodneCislo,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        // Posíláme všechno do Service na ověření
-        Uzivatel uzivatel = service.prihlasitUzivatele(rodneCislo, jmeno, prijmeni);
+        // 1. DETEKCE ADMINA (Přednostní kontrola)
+        if (ADMIN_RC.equals(rodneCislo) &&
+                ADMIN_JMENO.equalsIgnoreCase(jmeno) &&
+                ADMIN_PRIJMENI.equalsIgnoreCase(prijmeni)) {
 
-        if (uzivatel == null) {
-            // Upravená chybová hláška
-            redirectAttributes.addFlashAttribute("error", "Chyba přihlášení: Údaje nesouhlasí nebo uživatel neexistuje.");
+            // Uložíme do session značku, že je to admin
+            session.setAttribute("adminLogged", true);
+            session.setAttribute("userName", "Administrátor"); // Pro zobrazení v hlavičce
+
+            return "redirect:/admin/dashboard"; // Přesměrujeme do velína
+        }
+
+        // 2. DETEKCE STUDENTA (Klasika)
+        Student student = service.prihlasitStudenta(rodneCislo, jmeno, prijmeni);
+
+        if (student == null) {
+            redirectAttributes.addFlashAttribute("error", "Chyba přihlášení: Údaje nesouhlasí nebo student neexistuje.");
             return "redirect:/";
         }
 
-        session.setAttribute("prihlasenyUzivatel", uzivatel);
+        // Uložíme studenta
+        session.setAttribute("prihlasenyStudent", student);
         return "redirect:/vyber";
     }
 
-    // Hlavní stránka s výběrem jazyků
+
     @GetMapping("/vyber")
     public String showVyberJazyka(HttpSession session, Model model) {
-        Uzivatel uzivatel = (Uzivatel) session.getAttribute("prihlasenyUzivatel");
-
-        if (uzivatel == null) {
-            return "redirect:/";
-        }
+        Student student = (Student) session.getAttribute("prihlasenyStudent");
+        if (student == null) return "redirect:/";
 
         List<Jazyk> jazyky = service.ziskatVsechnyJazyky();
-        Registrace existujiciVolba = service.ziskatRegistraciUzivatele(uzivatel);
+        Registrace existujiciVolba = service.ziskatRegistraciStudenta(student);
 
-        model.addAttribute("uzivatel", uzivatel);
+        model.addAttribute("student", student);
         model.addAttribute("jazyky", jazyky);
-        model.addAttribute("mojeVolba", existujiciVolba); // Přejmenováno z mojeRegistrace
+        model.addAttribute("mojeVolba", existujiciVolba);
 
-        return "vyber"; // Odkazuje na soubor vyber.html (původně kurzy.html)
+        return "vyber";
     }
 
-    @PostMapping("/zapis-jazyka") // Změna URL akce
+    @PostMapping("/zapis-jazyka")
     public String processZapis(@RequestParam Integer jazykId, HttpSession session, RedirectAttributes redirectAttributes) {
-        Uzivatel uzivatel = (Uzivatel) session.getAttribute("prihlasenyUzivatel");
-
-        if (uzivatel == null) return "redirect:/";
+        Student student = (Student) session.getAttribute("prihlasenyStudent");
+        if (student == null) return "redirect:/";
 
         try {
-            service.vytvoritRegistraci(uzivatel.getUzivatelId(), jazykId);
+            service.vytvoritRegistraci(student.getStudentId(), jazykId);
             redirectAttributes.addFlashAttribute("success", "Jazyk byl úspěšně zvolen!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-
         return "redirect:/vyber";
     }
 

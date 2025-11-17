@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="">
+<head>
+    <title>Přehled registrací</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            .no-print { display: none; }
+            .page-break { page-break-after: always; }
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <h2>Seznam studentů podle jazyků</h2>
+        <div>
+            <button onclick="window.print()" class="btn btn-primary me-2">🖨️ Tisk</button>
+            <a href="/admin/logout" class="btn btn-outline-danger">Odhlásit</a>
+        </div>
+    </div>
+
+    <div th:each="jazyk : ${jazyky}" class="card mb-5 shadow-sm page-break">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h3 class="m-0 text-primary" th:text="${jazyk.nazevJazyka}">Jazyk</h3>
+            <span class="badge bg-secondary fs-6">
+                Stav: <span th:text="${jazyk.aktualniPocetRegistrovanych}"></span> / <span th:text="${jazyk.maxKapacita}"></span>
+            </span>
+        </div>
+
+        <div class="card-body p-0">
+            <div th:if="${jazyk.registrace.isEmpty()}" class="p-4 text-muted text-center">
+                Zatím se nikdo nepřihlásil.
+            </div>
+
+            <table th:if="${!jazyk.registrace.isEmpty()}" class="table table-striped table-hover mb-0 align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>Příjmení</th>
+                    <th>Jméno</th>
+                    <th>Rodné číslo</th>
+                    <th class="text-end">Čas zápisu</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="reg, rowStat : ${jazyk.registrace}">
+                    <td class="fw-bold text-muted" th:text="${rowStat.count} + '.'">1.</td>
+                    <td class="fw-bold" th:text="${reg.student.prijmeni}">Novák</td>
+                    <td th:text="${reg.student.jmeno}">Jan</td>
+                    <td class="font-monospace" th:text="${reg.student.rodneCislo}">050101/1234</td>
+                    <td class="text-end text-muted small"
+                        th:text="${#temporals.format(reg.datumRegistrace, 'dd.MM.yyyy HH:mm')}">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

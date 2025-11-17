@@ -2,10 +2,10 @@ package cz.rezervacnisystem.service;
 
 import cz.rezervacnisystem.model.Jazyk;
 import cz.rezervacnisystem.model.Registrace;
-import cz.rezervacnisystem.model.Uzivatel;
+import cz.rezervacnisystem.model.Student;
 import cz.rezervacnisystem.repository.JazykRepository;
 import cz.rezervacnisystem.repository.RegistraceRepository;
-import cz.rezervacnisystem.repository.UzivatelRepository;
+import cz.rezervacnisystem.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,82 +14,64 @@ import java.util.List;
 @Service
 public class JazykyService {
 
-    private final UzivatelRepository uzivatelRepository;
+    private final StudentRepository studentRepository;
     private final JazykRepository jazykRepository;
     private final RegistraceRepository registraceRepository;
 
-    public JazykyService(UzivatelRepository uzivatelRepo, JazykRepository jazykRepo, RegistraceRepository registraceRepo) {
-        this.uzivatelRepository = uzivatelRepo;
+    public JazykyService(StudentRepository studentRepo, JazykRepository jazykRepo, RegistraceRepository registraceRepo) {
+        this.studentRepository = studentRepo;
         this.jazykRepository = jazykRepo;
         this.registraceRepository = registraceRepo;
     }
 
-    // 1. Přihlášení - vrací objekt Uzivatel
-    // Upravená metoda přijímá 3 parametry
-    public Uzivatel prihlasitUzivatele(String rodneCislo, String zadaneJmeno, String zadanePrijmeni) {
-        // --- START ÚPRAVY ---
-        // 1. Normalizace RČ: Vyhodíme vše, co není číslo (mezery, lomítka, tečky...)
+    public Student prihlasitStudenta(String rodneCislo, String zadaneJmeno, String zadanePrijmeni) {
+        // Normalizace RČ (odstranění mezer, doplnění lomítka)
         String cisteRC = rodneCislo.replaceAll("[^0-9]", "");
-
-        // 2. Pokud má správnou délku (10 čísel), vložíme lomítko na správné místo
-        // Očekáváme formát v DB: XXXXXX/XXXX
-        String formatovaneRC = rodneCislo; // Defaultně necháme původní
+        String formatovaneRC = rodneCislo;
 
         if (cisteRC.length() == 10) {
             formatovaneRC = cisteRC.substring(0, 6) + "/" + cisteRC.substring(6);
         }
-        // --- KONEC ÚPRAVY ---
 
-        // Teď hledáme v DB už to opravené RČ s lomítkem
-        Uzivatel uzivatel = uzivatelRepository.findByRodneCislo(formatovaneRC).orElse(null);
+        Student student = studentRepository.findByRodneCislo(formatovaneRC).orElse(null);
 
-        if (uzivatel == null) {
+        if (student == null) {
             return null;
         }
 
-        boolean jmenoSedi = uzivatel.getJmeno().trim().equalsIgnoreCase(zadaneJmeno.trim());
-        boolean prijmeniSedi = uzivatel.getPrijmeni().trim().equalsIgnoreCase(zadanePrijmeni.trim());
+        boolean jmenoSedi = student.getJmeno().trim().equalsIgnoreCase(zadaneJmeno.trim());
+        boolean prijmeniSedi = student.getPrijmeni().trim().equalsIgnoreCase(zadanePrijmeni.trim());
 
-        if (jmenoSedi && prijmeniSedi) {
-            return uzivatel;
-        } else {
-            return null;
-        }
+        return (jmenoSedi && prijmeniSedi) ? student : null;
     }
 
-    // 2. Seznam jazyků
     public List<Jazyk> ziskatVsechnyJazyky() {
         return jazykRepository.findAll();
     }
 
-    // 3. Kontrola existující registrace - přijímá objekt Uzivatel
-    public Registrace ziskatRegistraciUzivatele(Uzivatel uzivatel) {
-        List<Registrace> registrace = registraceRepository.findByUzivatel(uzivatel);
+    public Registrace ziskatRegistraciStudenta(Student student) {
+        List<Registrace> registrace = registraceRepository.findByStudent(student);
         return registrace.isEmpty() ? null : registrace.getFirst();
     }
 
-    // 4. Vytvoření registrace
     @Transactional
-    public void vytvoritRegistraci(Integer uzivatelId, Integer jazykId) throws Exception {
-        // Načítáme entitu Uzivatel
-        Uzivatel uzivatel = uzivatelRepository.findById(uzivatelId)
-                .orElseThrow(() -> new Exception("Uživatel neexistuje"));
+    public void vytvoritRegistraci(Integer studentId, Integer jazykId) throws Exception {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new Exception("Student neexistuje"));
 
         Jazyk jazyk = jazykRepository.findById(jazykId)
                 .orElseThrow(() -> new Exception("Jazyk neexistuje"));
 
-        // Kontrola duplicity
-        if (!registraceRepository.findByUzivatel(uzivatel).isEmpty()) {
-            throw new Exception("Už jste zapsán(a) na jiný kurz.");
+        if (!registraceRepository.findByStudent(student).isEmpty()) {
+            throw new Exception("Už máte zvolený jazyk.");
         }
 
-        // Kontrola kapacity
         if (jazyk.jePlno()) {
-            throw new Exception("Kapacita kurzu je naplněna.");
+            throw new Exception("Kapacita jazyka je naplněna.");
         }
 
         Registrace novaRegistrace = new Registrace();
-        novaRegistrace.setUzivatel(uzivatel);
+        novaRegistrace.setStudent(student);
         novaRegistrace.setJazyk(jazyk);
         registraceRepository.save(novaRegistrace);
     }

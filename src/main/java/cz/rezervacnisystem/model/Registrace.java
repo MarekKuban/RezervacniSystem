@@ -16,8 +16,8 @@ public class Registrace {
     private Integer registraceId;
 
     @ManyToOne
-    @JoinColumn(name = "uzivatel_id", nullable = false)
-    private Uzivatel uzivatel;
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
 
     @ManyToOne
     @JoinColumn(name = "jazyk_id", nullable = false)

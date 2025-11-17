@@ -51,18 +51,45 @@
     const input = document.getElementById('rcInput');
 
     input.addEventListener('input', function (e) {
-        let value = e.target.value;
-
-        // 1. Odstraníme všechno, co není číslo (kdyby tam zkoušeli psát písmena)
-        value = value.replace(/\D/g, '');
-
-        // 2. Pokud je delší než 6 znaků, přidáme za 6. znak lomítko
-        if (value.length > 6) {
-            value = value.slice(0, 6) + '/' + value.slice(6, 10);
+        // 1. Pokud uživatel zrovna maže (Backspace), nebudeme mu do toho sahat,
+        // jinak by se mu tam to lomítko vracelo a nemohl by ho smazat.
+        if (e.inputType === 'deleteContentBackward') {
+            return;
         }
 
-        // 3. Vrátíme upravenou hodnotu zpět do políčka
-        e.target.value = value;
+        let value = input.value;
+
+        // 2. Získáme čistá čísla (odstraníme vše, co není číslo)
+        let numbers = value.replace(/\D/g, '');
+
+        // 3. Logika formátování
+        // Pokud máme více než 6 čísel, "natvrdo" zformátujeme na XXXXXX/YYYY
+        if (numbers.length > 6) {
+            input.value = numbers.slice(0, 6) + '/' + numbers.slice(6, 10);
+        }
+            // 4. Pokud uživatel napsal přesně 6 čísel a manuálně přidal lomítko
+        // tak mu to lomítko nesmažeme (předchozí skript by ho smazal).
+        else if (numbers.length === 6 && value.includes('/')) {
+            // Jen se ujistíme, že je lomítko na správném místě (za 6. číslem)
+            if (!value.startsWith(numbers.slice(0, 6) + '/')) {
+                input.value = numbers.slice(0, 6) + '/';
+            }
+            // Jinak neděláme nic a necháme tam to lomítko, co napsal uživatel.
+        }
+        // 5. Pokud tam uživatel píše písmena nebo znaky jinam než má
+        else {
+            // Povolíme jen čísla a jedno lomítko na 7. pozici
+            // (Tohle "čistí" vstup, kdyby tam někdo psal abecedu)
+            if (!/^\d{0,6}\/?\d{0,4}$/.test(value)) {
+                // Pokud vstup neodpovídá formátu (např. písmena), vrátíme tam jen čísla
+                // Pokud je čísel 6 a víc, přidáme lomítko
+                if (numbers.length >= 6) {
+                    input.value = numbers.slice(0, 6) + '/' + numbers.slice(6, 10);
+                } else {
+                    input.value = numbers;
+                }
+            }
+        }
     });
 </script>
 
