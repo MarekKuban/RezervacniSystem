@@ -1,12 +1,13 @@
 package cz.rezervacnisystem.model;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+import java.util.List;
 
 @Entity
 @Table(name = "jazyky")
-@Data // Lombok vygeneruje gettery, settery, toString...
+@Data
 public class Jazyk {
 
     @Id
@@ -20,15 +21,17 @@ public class Jazyk {
     @Column(name = "max_kapacita", nullable = false)
     private Integer maxKapacita;
 
-    // Zde je důležité: insertable=false, updatable=false
-    // Důvod: Tuto hodnotu spravují tvé SQL TRIGGERY.
-    // Java ji má jen pro čtení (aby viděla, jestli je plno).
-    // Kdybychom to nechali zapisovat, Java by mohla přepsat výpočet triggeru.
     @Column(name = "aktualni_pocet_registrovanych", insertable = false, updatable = false)
     private Integer aktualniPocetRegistrovanych;
 
-    // Pomocná metoda pro logiku
+    // Vazba pro Admin panel: Umožní nám získat seznam studentů pro tento jazyk
+    @OneToMany(mappedBy = "jazyk")
+    @ToString.Exclude // Důležité pro Lombok, aby se nezacyklil
+    private List<Registrace> registrace;
+
     public boolean jePlno() {
-        return this.aktualniPocetRegistrovanych >= this.maxKapacita;
+        // Ošetření null hodnoty pro bezpečnost
+        int aktualni = (aktualniPocetRegistrovanych == null) ? 0 : aktualniPocetRegistrovanych;
+        return aktualni >= maxKapacita;
     }
 }

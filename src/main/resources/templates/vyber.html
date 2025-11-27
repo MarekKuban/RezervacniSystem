@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="">
 <head>
     <meta charset="UTF-8">
     <title>Výběr jazyka</title>
@@ -15,7 +15,7 @@
         <div>
             <h2 class="mb-0">Volba 2. cizího jazyka</h2>
             <p class="text-muted mb-0">
-                Přihlášený student: <strong th:text="${uzivatel.jmeno} + ' ' + ${uzivatel.prijmeni}">Jan Novák</strong>
+                Přihlášený student: <strong th:text="${student.jmeno} + ' ' + ${student.prijmeni}">Jan Novák</strong>
             </p>
         </div>
         <a href="/logout" class="btn btn-outline-danger">Odhlásit se</a>
@@ -31,7 +31,7 @@
                 <h3 class="mt-3">Máte hotovo!</h3>
                 <p class="lead">Zvolil(a) jste si: <strong class="text-success" th:text="${mojeVolba.jazyk.nazevJazyka}">Němčina</strong></p>
                 <hr>
-                <p class="text-muted small">Volba byla uložena. Pro změnu kontaktujte vedení školy.</p>
+                <p class="text-muted small">Volba byla uložena.<!-- Pro změnu kontaktujte vedení školy. --></p>
             </div>
         </div>
     </div>

@@ -3,17 +3,16 @@ package cz.rezervacnisystem.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "uzivatele")
+@Table(name = "studenti")
 @Data
-public class Uzivatel {
+public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "uzivatel_id")
-    private Integer uzivatelId;
+    @Column(name = "student_id")
+    private Integer studentId;
 
     @Column(name = "rodne_cislo", nullable = false, unique = true)
     private String rodneCislo;
@@ -23,7 +22,4 @@ public class Uzivatel {
 
     @Column(nullable = false)
     private String prijmeni;
-
-    @Column(name = "datum_registrace", insertable = false, updatable = false)
-    private LocalDateTime datumRegistrace;
 }
