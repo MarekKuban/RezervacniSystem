@@ -1,0 +1,9 @@
+poznámky pro projekt:
+	nastavit heslo v příjmení pro jméno admin rč 000000/0000
+	zkrášlit všude grafiku
+	naplánovat hosting, předvádění na projektovém dnu
+	celkově projít a zkontrolovat kód, pročistit komenty
+	přidání možnosti změnit jazyk !
+	v admin dashboard je čas registrace posunutý o hodinu dopředu
+	fixnout github
+	
