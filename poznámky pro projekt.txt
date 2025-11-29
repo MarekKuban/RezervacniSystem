@@ -1,5 +1,6 @@
 poznámky pro projekt:
 	nastavit heslo v příjmení pro jméno admin rč 000000/0000
+	přidat do tabulky studenti sloupec třída (předem víme jaký student je na jakém oboru. Pro účely řazení v tabulkách)
 	zkrášlit všude grafiku
 	naplánovat hosting, předvádění na projektovém dnu
 	celkově projít a zkontrolovat kód, pročistit komenty
@@ -7,3 +8,4 @@ poznámky pro projekt:
 	fixnout github
 
 	
+
