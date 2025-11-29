@@ -43,7 +43,7 @@
                     <th>Jméno</th>
                     <th>Rodné číslo</th>
                     <th class="text-end">Čas zápisu</th>
-                </tr>
+                    <th class="text-center" style="width: 100px;">Akce</th> </tr>
                 </thead>
                 <tbody>
                 <tr th:each="reg, rowStat : ${jazyk.registrace}">
@@ -53,6 +53,13 @@
                     <td class="font-monospace" th:text="${reg.student.rodneCislo}">050101/1234</td>
                     <td class="text-end text-muted small"
                         th:text="${#temporals.format(reg.datumRegistrace, 'dd.MM.yyyy HH:mm')}">
+                    </td>
+                    <td class="text-center">
+                        <form action="/admin/zrusit-registraci" method="post"
+                              onsubmit="return confirm('Opravdu chcete zrušit registraci tomuto studentovi?');">
+                            <input type="hidden" name="registraceId" th:value="${reg.registraceId}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">❌</button>
+                        </form>
                     </td>
                 </tr>
                 </tbody>

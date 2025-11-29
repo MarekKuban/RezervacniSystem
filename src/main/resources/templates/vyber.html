@@ -31,7 +31,14 @@
                 <h3 class="mt-3">Máte hotovo!</h3>
                 <p class="lead">Zvolil(a) jste si: <strong class="text-success" th:text="${mojeVolba.jazyk.nazevJazyka}">Němčina</strong></p>
                 <hr>
-                <p class="text-muted small">Volba byla uložena.<!-- Pro změnu kontaktujte vedení školy. --></p>
+
+                <p class="text-muted mb-4">Chcete změnit názor?</p>
+                <form action="/zrusit-jazyk" method="post"
+                      onsubmit="return confirm('Opravdu chcete zrušit svou volbu? Místo může mezitím obsadit někdo jiný.');">
+                    <button type="submit" class="btn btn-outline-danger">
+                        Zrušit volbu a vybrat znovu 🔄
+                    </button>
+                </form>
             </div>
         </div>
     </div>

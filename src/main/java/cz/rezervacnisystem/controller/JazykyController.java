@@ -68,7 +68,6 @@ public class JazykyController {
         return "redirect:/vyber";
     }
 
-
     @GetMapping("/vyber")
     public String showVyberJazyka(HttpSession session, Model model) {
         Student student = (Student) session.getAttribute("prihlasenyStudent");
@@ -106,6 +105,20 @@ public class JazykyController {
             redirectAttributes.addFlashAttribute("success", "Jazyk byl úspěšně zvolen!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/vyber";
+    }
+
+    @PostMapping("/zrusit-jazyk")
+    public String zrusitJazyk(HttpSession session, RedirectAttributes redirectAttributes) {
+        Student student = (Student) session.getAttribute("prihlasenyStudent");
+        if (student == null) return "redirect:/";
+
+        try {
+            service.zrusitRegistraciStudenta(student);
+            redirectAttributes.addFlashAttribute("success", "Vaše volba byla zrušena. Můžete si vybrat znovu.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Chyba při rušení: " + e.getMessage());
         }
         return "redirect:/vyber";
     }

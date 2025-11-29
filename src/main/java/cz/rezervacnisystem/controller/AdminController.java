@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -37,5 +39,15 @@ public class AdminController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/";
+    }
+    @PostMapping("/admin/zrusit-registraci")
+    public String zrusitRegistraci(@RequestParam Integer registraceId, HttpSession session) {
+        // Bezpečnostní pojistka - je admin přihlášen?
+        if (session.getAttribute("adminLogged") == null) {
+            return "redirect:/";
+        }
+
+        service.zrusitRegistraciAdminem(registraceId);
+        return "redirect:/admin/dashboard";
     }
 }

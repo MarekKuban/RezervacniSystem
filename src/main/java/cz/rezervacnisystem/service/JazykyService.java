@@ -24,6 +24,21 @@ public class JazykyService {
         this.registraceRepository = registraceRepo;
     }
 
+    @Transactional
+    public void zrusitRegistraciAdminem(Integer registraceId) {
+        registraceRepository.deleteById(registraceId);
+    }
+
+    @Transactional
+    public void zrusitRegistraciStudenta(Student student) throws Exception {
+        Registrace registrace = ziskatRegistraciStudenta(student);
+        if (registrace != null) {
+            registraceRepository.delete(registrace);
+        } else {
+            throw new Exception("Nemáte žádnou registraci ke zrušení.");
+        }
+    }
+
     public Student prihlasitStudenta(String rodneCislo, String zadaneJmeno, String zadanePrijmeni) {
         // Normalizace RČ (odstranění mezer, doplnění lomítka)
         String cisteRC = rodneCislo.replaceAll("[^0-9]", "");
