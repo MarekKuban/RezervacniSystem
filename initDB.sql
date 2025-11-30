@@ -20,7 +20,8 @@ CREATE TABLE studenti (
                           student_id INT PRIMARY KEY AUTO_INCREMENT,
                           rodne_cislo VARCHAR(11) NOT NULL UNIQUE, -- Formát RRRRMM/XXXX
                           jmeno VARCHAR(100) NOT NULL,
-                          prijmeni VARCHAR(100) NOT NULL
+                          prijmeni VARCHAR(100) NOT NULL,
+                          trida VARCHAR(1) NOT NULL
 );
 
 -- 5. Tabulka: REGISTRACE
@@ -76,8 +77,9 @@ DELIMITER ;
 INSERT INTO jazyky (nazev_jazyka, max_kapacita) VALUES
                                                     ('Španělština', 15),
                                                     ('Němčina', 30),
-                                                    ('Ruština', 20);
+                                                    ('Ruština', 20),
+                                                    ('Francouzština', 20);
 
 -- Testovací student
-INSERT INTO studenti (rodne_cislo, jmeno, prijmeni) VALUES
-    ('111111/1111', 'Jan', 'Novák');
+INSERT INTO studenti (rodne_cislo, jmeno, prijmeni, trida) VALUES
+    ('111111/1111', 'Jan', 'Novák', 'D');
