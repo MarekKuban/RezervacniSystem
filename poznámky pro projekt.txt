@@ -4,8 +4,8 @@ poznámky pro projekt:
 	zkrášlit všude grafiku
 	naplánovat hosting, předvádění na projektovém dnu
 	celkově projít a zkontrolovat kód, pročistit komenty
-	přidání možnosti změnit jazyk !
 	fixnout github
 
 	
+
 
