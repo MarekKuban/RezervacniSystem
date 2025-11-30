@@ -5,11 +5,11 @@
     <title>Přihlášení - Volba jazyka</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center" style="height: 100vh;">
+<body class="bg-light d-flex align-items-center justify-content-center" style="height: 100%;">
 
 <div class="card shadow-lg p-4 border-0" style="max-width: 400px; width: 100%;">
     <div class="text-center mb-4">
-        <h1>🏫</h1>
+        <img th:src="@{/img/oavm_logo.jpg}" alt="Logo školy" class="img-fluid py-2" style="max-width: 100vh;">
         <h3>Volba 2. cizího jazyka</h3>
         <p class="text-muted">Zadejte své rodné číslo pro vstup</p>
     </div>
@@ -19,7 +19,7 @@
     <form action="/login" method="post">
         <div class="mb-3">
             <label class="form-label fw-bold">Jméno</label>
-            <label>
+            <label style="justify-content: center; text-align: center;">
                 <input type="text" name="jmeno" class="form-control" placeholder="Např. Jan" required>
             </label>
         </div>
