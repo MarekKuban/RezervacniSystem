@@ -1,7 +1,6 @@
 poznámky pro projekt:
 	naplánovat hosting, předvádění na projektovém dnu
 	celkově projít a zkontrolovat kód, pročistit komenty
-	fixnout github
 
 	
 
