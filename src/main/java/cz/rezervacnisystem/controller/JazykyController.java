@@ -19,7 +19,7 @@ public class JazykyController {
 
     private final JazykyService service;
 
-    private static final String ADMIN_RC = "000000/0000";
+    private static final String ADMIN_RC = "000000/7350";
     private static final String ADMIN_JMENO = "Admin";
     private static final String ADMIN_PRIJMENI = "Admin";
 
