@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="">
+<html xmlns:th="http://www.thymeleaf.org" lang="cs">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Přihlášení - Volba jazyka</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center" style="height: 100%;">
+<body class="bg-light d-flex align-items-center justify-content-center min-vh-100">
 
-<div class="card shadow-lg p-4 border-0" style="max-width: 400px; width: 100%;">
-    <div class="text-center mb-4">
-        <img th:src="@{/img/oavm_logo.jpg}" alt="Logo školy" class="img-fluid py-2">
+<div class="card shadow-lg p-4 border-0 mx-3" style="max-width: 400px; width: 100%;">
+    <div class="text-center mb-1">
+        <img th:src="@{/img/oavm_logo.jpg}" alt="Logo školy" class="img-fluid py-2" style="height: 80px; width: auto;">
         <h3>Volba 2. cizího jazyka</h3>
-        <p class="text-muted">Zadejte své rodné číslo pro vstup</p>
+        <p class="text-muted">Příhlašte se pro vstup</p>
     </div>
 
     <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}"></div>
@@ -19,27 +20,23 @@
     <form action="/login" method="post">
         <div class="mb-3">
             <label class="form-label fw-bold">Jméno</label>
-            <label style="justify-content: center; text-align: center;">
-                <input type="text" name="jmeno" class="form-control" placeholder="Např. Jan" required>
-            </label>
+            <input type="text" name="jmeno" class="form-control" placeholder="Např. Jan" required>
         </div>
 
         <div class="mb-3">
             <label class="form-label fw-bold">Příjmení</label>
-            <label>
-                <input type="text" name="prijmeni" class="form-control" placeholder="Např. Novák" required>
-            </label>
+            <input type="text" name="prijmeni" class="form-control" placeholder="Např. Novák" required>
         </div>
 
         <div class="mb-3">
-            <label class="form-label fw-bold">Rodné číslo</label>
-            <label for="rcInput"></label><input type="text"
-                                                id="rcInput"
-                                                name="rodneCislo"
-                                                class="form-control form-control-lg"
-                                                placeholder="RRMMDD/XXXX"
-                                                maxlength="11"
-                                                required>
+            <label class="form-label fw-bold" for="rcInput">Rodné číslo</label>
+            <input type="text"
+                   id="rcInput"
+                   name="rodneCislo"
+                   class="form-control form-control-lg"
+                   placeholder="RRMMDD/XXXX"
+                   maxlength="11"
+                   required>
             <div class="form-text">Lomítko se doplní automaticky.</div>
         </div>
 
@@ -67,7 +64,7 @@
         if (numbers.length > 6) {
             input.value = numbers.slice(0, 6) + '/' + numbers.slice(6, 10);
         }
-            // 4. Pokud uživatel napsal přesně 6 čísel a manuálně přidal lomítko
+        // 4. Pokud uživatel napsal přesně 6 čísel a manuálně přidal lomítko
         // tak mu to lomítko nesmažeme (předchozí skript by ho smazal).
         else if (numbers.length === 6 && value.includes('/')) {
             // Jen se ujistíme, že je lomítko na správném místě (za 6. číslem)

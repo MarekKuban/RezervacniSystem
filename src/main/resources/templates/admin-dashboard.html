@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Přehled registrací</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -8,15 +10,21 @@
             .no-print { display: none; }
             .page-break { page-break-after: always; }
         }
+
+        /* Drobná úprava pro mobily - zmenšení písma v tabulce pro lepší přehlednost */
+        @media (max-width: 576px) {
+            .table { font-size: 0.85rem; }
+            h2 { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body class="bg-light">
 
 <div class="container py-5">
 
-    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
-        <h2>Seznam studentů podle jazyků</h2>
-        <div>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 no-print gap-3">
+        <h2 class="text-center text-md-start">Seznam studentů podle jazyků</h2>
+        <div class="d-flex w-100 w-md-auto justify-content-center justify-content-md-end">
             <button onclick="window.print()" class="btn btn-primary me-2">🖨️ Tisk</button>
             <a href="/admin/logout" class="btn btn-outline-danger">Odhlásit</a>
         </div>
@@ -24,8 +32,8 @@
 
     <div th:each="jazyk : ${jazyky}" class="card mb-5 shadow-sm page-break">
         <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-            <h3 class="m-0 text-primary" th:text="${jazyk.nazevJazyka}">Jazyk</h3>
-            <span class="badge bg-secondary fs-6">
+            <h3 class="m-0 text-primary fs-4" th:text="${jazyk.nazevJazyka}">Jazyk</h3>
+            <span class="badge bg-secondary fs-6 text-nowrap">
                 Stav: <span th:text="${jazyk.aktualniPocetRegistrovanych}"></span> / <span th:text="${jazyk.maxKapacita}"></span>
             </span>
         </div>
@@ -35,36 +43,38 @@
                 Zatím se nikdo nepřihlásil.
             </div>
 
-            <table th:if="${!jazyk.registrace.isEmpty()}" class="table table-striped table-hover mb-0 align-middle">
-                <thead class="table-light">
-                <tr>
-                    <th style="width: 50px;">#</th>
-                    <th>Příjmení</th>
-                    <th>Jméno</th>
-                    <th>Rodné číslo</th>
-                    <th class="text-end">Čas zápisu</th>
-                    <th class="text-center" style="width: 100px;">Akce</th> </tr>
-                </thead>
-                <tbody>
-                <tr th:each="reg, rowStat : ${jazyk.registrace}">
-                    <td class="fw-bold text-muted" th:text="${rowStat.count} + '.'">1.</td>
-                    <td class="fw-bold" th:text="${reg.student.prijmeni}">Novák</td>
-                    <td th:text="${reg.student.jmeno}">Jan</td>
-                    <td class="font-monospace" th:text="${reg.student.rodneCislo}">050101/1234</td>
-                    <td class="text-end text-muted small"
-                        th:text="${#temporals.format(reg.datumRegistrace, 'dd.MM.yyyy HH:mm')}">
-                    </td>
-                    <td class="text-center">
-                        <form action="/admin/zrusit-registraci" method="post"
-                              onsubmit="return confirm('Opravdu chcete zrušit registraci tomuto studentovi?');">
-                            <input type="hidden" name="registraceId" th:value="${reg.registraceId}">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">❌</button>
-                        </form>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+            <div th:if="${!jazyk.registrace.isEmpty()}" class="table-responsive">
+                <table class="table table-striped table-hover mb-0 align-middle text-nowrap">
+                    <thead class="table-light">
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Příjmení</th>
+                        <th>Jméno</th>
+                        <th>Rodné číslo</th>
+                        <th class="text-end">Čas zápisu</th>
+                        <th class="text-center" style="width: 100px;">Akce</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="reg, rowStat : ${jazyk.registrace}">
+                        <td class="fw-bold text-muted" th:text="${rowStat.count} + '.'">1.</td>
+                        <td class="fw-bold" th:text="${reg.student.prijmeni}">Novák</td>
+                        <td th:text="${reg.student.jmeno}">Jan</td>
+                        <td class="font-monospace" th:text="${reg.student.rodneCislo}">050101/1234</td>
+                        <td class="text-end text-muted small"
+                            th:text="${#temporals.format(reg.datumRegistrace, 'dd.MM.yyyy HH:mm')}">
+                        </td>
+                        <td class="text-center">
+                            <form action="/admin/zrusit-registraci" method="post"
+                                  onsubmit="return confirm('Opravdu chcete zrušit registraci tomuto studentovi?');">
+                                <input type="hidden" name="registraceId" th:value="${reg.registraceId}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">❌</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div> </div>
     </div>
 </div>
 </body>
