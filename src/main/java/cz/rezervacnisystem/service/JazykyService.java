@@ -71,16 +71,18 @@ public class JazykyService {
 
     @Transactional
     public void vytvoritRegistraci(Integer studentId, Integer jazykId) throws Exception {
+
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new Exception("Student neexistuje"));
-
-        Jazyk jazyk = jazykRepository.findById(jazykId)
+        Jazyk jazyk = jazykRepository.findByIdWithLock(jazykId)
                 .orElseThrow(() -> new Exception("Jazyk neexistuje"));
 
+        // Kontrola, zda už student něco nemá (zbytek kódu zůstává stejný)
         if (!registraceRepository.findByStudent(student).isEmpty()) {
             throw new Exception("Už máte zvolený jazyk.");
         }
 
+        // Tady už máme jistotu, že nám nikdo "pod rukama" nezměnil počet míst
         if (jazyk.jePlno()) {
             throw new Exception("Kapacita jazyka je naplněna.");
         }
