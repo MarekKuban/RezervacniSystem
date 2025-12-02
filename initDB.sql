@@ -59,6 +59,7 @@ INSERT INTO studenti (rodne_cislo, jmeno, prijmeni, trida) VALUES
 ('080105/0005', 'Martin', 'Procházka', 'C'),
 ('080106/0006', 'Eva', 'Kučerová', 'C'),
 ('080107/0007', 'Jakub', 'Veselý', 'D'),
+('080111/0011', 'Martin', 'Surovčák', 'D'),
 ('080108/0008', 'Anna', 'Horáková', 'D'),
 ('080109/0009', 'David', 'Němec', 'E'),
 ('080110/0010', 'Lenka', 'Marek', 'E');
