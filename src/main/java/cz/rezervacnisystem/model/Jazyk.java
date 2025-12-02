@@ -15,8 +15,11 @@ public class Jazyk {
     @Column(name = "jazyk_id")
     private Integer jazykId;
 
-    @Column(name = "nazev_jazyka", nullable = false, unique = true)
+    @Column(name = "nazev_jazyka", nullable = false)
     private String nazevJazyka;
+
+    @Column(name = "trida_urceni", nullable = false)
+    private String tridaUrceni;
 
     @Column(name = "max_kapacita", nullable = false)
     private Integer maxKapacita;
@@ -24,13 +27,11 @@ public class Jazyk {
     @Column(name = "aktualni_pocet_registrovanych", insertable = false, updatable = false)
     private Integer aktualniPocetRegistrovanych;
 
-    // Vazba pro Admin panel: Umožní nám získat seznam studentů pro tento jazyk
     @OneToMany(mappedBy = "jazyk")
-    @ToString.Exclude // Důležité pro Lombok, aby se nezacyklil
+    @ToString.Exclude
     private List<Registrace> registrace;
 
     public boolean jePlno() {
-        // Ošetření null hodnoty pro bezpečnost
         int aktualni = (aktualniPocetRegistrovanych == null) ? 0 : aktualniPocetRegistrovanych;
         return aktualni >= maxKapacita;
     }

@@ -1,6 +1,5 @@
 package cz.rezervacnisystem.model;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -22,4 +21,7 @@ public class Student {
 
     @Column(nullable = false)
     private String prijmeni;
+
+    @Column(nullable = false)
+    private String trida;
 }

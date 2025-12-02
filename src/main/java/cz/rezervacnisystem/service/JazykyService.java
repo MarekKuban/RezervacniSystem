@@ -9,6 +9,7 @@ import cz.rezervacnisystem.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -18,29 +19,32 @@ public class JazykyService {
     private final JazykRepository jazykRepository;
     private final RegistraceRepository registraceRepository;
 
+    // ČASOVÉ OMEZENÍ: Nastaveno od včerejška na 7 dní dopředu
+    private static final LocalDateTime START_REGISTRACE = LocalDateTime.of(2025, 9, 1, 8, 0);
+    private static final LocalDateTime KONEC_REGISTRACE = LocalDateTime.of(2025, 12, 2, 20, 19);
+
     public JazykyService(StudentRepository studentRepo, JazykRepository jazykRepo, RegistraceRepository registraceRepo) {
         this.studentRepository = studentRepo;
         this.jazykRepository = jazykRepo;
         this.registraceRepository = registraceRepo;
     }
 
-    @Transactional
-    public void zrusitRegistraciAdminem(Integer registraceId) {
-        registraceRepository.deleteById(registraceId);
+    // --- NOVÁ METODA PRO KONTROLER (Bez ní by to spadlo) ---
+    public List<Jazyk> ziskatJazykyProTridu(String trida) {
+        return jazykRepository.findByTridaUrceni(trida);
     }
 
-    @Transactional
-    public void zrusitRegistraciStudenta(Student student) throws Exception {
-        Registrace registrace = ziskatRegistraciStudenta(student);
-        if (registrace != null) {
-            registraceRepository.delete(registrace);
-        } else {
-            throw new Exception("Nemáte žádnou registraci ke zrušení.");
-        }
+    public List<Jazyk> ziskatVsechnyJazyky() {
+        return jazykRepository.findAll();
+    }
+
+    public Registrace ziskatRegistraciStudenta(Student student) {
+        List<Registrace> registrace = registraceRepository.findByStudent(student);
+        return registrace.isEmpty() ? null : registrace.get(0);
     }
 
     public Student prihlasitStudenta(String rodneCislo, String zadaneJmeno, String zadanePrijmeni) {
-        // Normalizace RČ (odstranění mezer, doplnění lomítka)
+        // Ponechal jsem tvou logiku pro formátování RČ (to je super věc)
         String cisteRC = rodneCislo.replaceAll("[^0-9]", "");
         String formatovaneRC = rodneCislo;
 
@@ -60,29 +64,30 @@ public class JazykyService {
         return (jmenoSedi && prijmeniSedi) ? student : null;
     }
 
-    public List<Jazyk> ziskatVsechnyJazyky() {
-        return jazykRepository.findAll();
-    }
-
-    public Registrace ziskatRegistraciStudenta(Student student) {
-        List<Registrace> registrace = registraceRepository.findByStudent(student);
-        return registrace.isEmpty() ? null : registrace.getFirst();
-    }
-
     @Transactional
     public void vytvoritRegistraci(Integer studentId, Integer jazykId) throws Exception {
+        // 1. KONTROLA ČASU (Nové)
+        if (LocalDateTime.now().isBefore(START_REGISTRACE)) {
+            throw new Exception("Registrace ještě nebyla spuštěna.");
+        }
+        if (LocalDateTime.now().isAfter(KONEC_REGISTRACE)) {
+            throw new Exception("Registrace již byla ukončena.");
+        }
 
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new Exception("Student neexistuje"));
         Jazyk jazyk = jazykRepository.findByIdWithLock(jazykId)
                 .orElseThrow(() -> new Exception("Jazyk neexistuje"));
 
-        // Kontrola, zda už student něco nemá (zbytek kódu zůstává stejný)
+        // 2. KONTROLA TŘÍDY (Nové - aby si někdo z A nezapsal jazyk pro B)
+        if (!jazyk.getTridaUrceni().equals(student.getTrida())) {
+            throw new Exception("Tento jazyk není určen pro vaši třídu (" + student.getTrida() + ").");
+        }
+
         if (!registraceRepository.findByStudent(student).isEmpty()) {
             throw new Exception("Už máte zvolený jazyk.");
         }
 
-        // Tady už máme jistotu, že nám nikdo "pod rukama" nezměnil počet míst
         if (jazyk.jePlno()) {
             throw new Exception("Kapacita jazyka je naplněna.");
         }
@@ -91,5 +96,29 @@ public class JazykyService {
         novaRegistrace.setStudent(student);
         novaRegistrace.setJazyk(jazyk);
         registraceRepository.save(novaRegistrace);
+    }
+
+    public LocalDateTime getKonecRegistrace() {
+        return KONEC_REGISTRACE;
+    }
+
+    @Transactional
+    public void zrusitRegistraciStudenta(Student student) throws Exception {
+        // I rušení je omezeno časem
+        if (LocalDateTime.now().isAfter(KONEC_REGISTRACE)) {
+            throw new Exception("Registrace byla ukončena, změny již nejsou možné.");
+        }
+
+        Registrace registrace = ziskatRegistraciStudenta(student);
+        if (registrace != null) {
+            registraceRepository.delete(registrace);
+        } else {
+            throw new Exception("Nemáte žádnou registraci ke zrušení.");
+        }
+    }
+
+    @Transactional
+    public void zrusitRegistraciAdminem(Integer registraceId) {
+        registraceRepository.deleteById(registraceId);
     }
 }

@@ -18,7 +18,6 @@ import java.util.List;
 public class JazykyController {
 
     private final JazykyService service;
-
     private static final String ADMIN_RC = "000000/7350";
     private static final String ADMIN_JMENO = "Admin";
     private static final String ADMIN_PRIJMENI = "Admin";
@@ -29,41 +28,21 @@ public class JazykyController {
 
     @GetMapping("/")
     public String showLogin(Model model) {
-        if (!model.containsAttribute("error")) {
-            model.addAttribute("error", null);
-        }
+        if (!model.containsAttribute("error")) model.addAttribute("error", null);
         return "login";
     }
 
     @PostMapping("/login")
-    public String processLogin(
-            @RequestParam String jmeno,
-            @RequestParam String prijmeni,
-            @RequestParam String rodneCislo,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
-
-        // 1. DETEKCE ADMINA (Přednostní kontrola)
-        if (ADMIN_RC.equals(rodneCislo) &&
-                ADMIN_JMENO.equalsIgnoreCase(jmeno) &&
-                ADMIN_PRIJMENI.equalsIgnoreCase(prijmeni)) {
-
-            // Uložíme do session značku, že je to admin
+    public String processLogin(@RequestParam String jmeno, @RequestParam String prijmeni, @RequestParam String rodneCislo, HttpSession session, RedirectAttributes redirectAttributes) {
+        if (ADMIN_RC.equals(rodneCislo) && ADMIN_JMENO.equalsIgnoreCase(jmeno) && ADMIN_PRIJMENI.equalsIgnoreCase(prijmeni)) {
             session.setAttribute("adminLogged", true);
-            session.setAttribute("userName", "Administrátor"); // Pro zobrazení v hlavičce
-
-            return "redirect:/admin/dashboard"; // Přesměrujeme do velína
+            return "redirect:/admin/dashboard";
         }
-
-        // 2. DETEKCE STUDENTA (Klasika)
         Student student = service.prihlasitStudenta(rodneCislo, jmeno, prijmeni);
-
         if (student == null) {
-            redirectAttributes.addFlashAttribute("error", "Chyba přihlášení: Údaje nesouhlasí nebo student neexistuje.");
+            redirectAttributes.addFlashAttribute("error", "Chyba přihlášení.");
             return "redirect:/";
         }
-
-        // Uložíme studenta
         session.setAttribute("prihlasenyStudent", student);
         return "redirect:/vyber";
     }
@@ -71,27 +50,18 @@ public class JazykyController {
     @GetMapping("/vyber")
     public String showVyberJazyka(HttpSession session, Model model) {
         Student student = (Student) session.getAttribute("prihlasenyStudent");
+        if (student == null) return "redirect:/";
 
-        if (student == null) {
-            if (session.getAttribute("adminLogged") != null) return "redirect:/admin/dashboard";
-            return "redirect:/";
-        }
-
-        List<Jazyk> jazyky = service.ziskatVsechnyJazyky();
+        List<Jazyk> jazyky = service.ziskatJazykyProTridu(student.getTrida());
         Registrace existujiciVolba = service.ziskatRegistraciStudenta(student);
 
         model.addAttribute("student", student);
         model.addAttribute("jazyky", jazyky);
         model.addAttribute("mojeVolba", existujiciVolba);
+        if (!model.containsAttribute("success")) model.addAttribute("success", null);
+        if (!model.containsAttribute("error")) model.addAttribute("error", null);
 
-        if (!model.containsAttribute("success")) {
-            model.addAttribute("success", null);
-        }
-        if (!model.containsAttribute("error")) {
-            model.addAttribute("error", null);
-        }
-
-
+        model.addAttribute("konecRegistrace", service.getKonecRegistrace());
         return "vyber";
     }
 
@@ -116,9 +86,9 @@ public class JazykyController {
 
         try {
             service.zrusitRegistraciStudenta(student);
-            redirectAttributes.addFlashAttribute("success", "Vaše volba byla zrušena. Můžete si vybrat znovu.");
+            redirectAttributes.addFlashAttribute("success", "Volba zrušena.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Chyba při rušení: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/vyber";
     }

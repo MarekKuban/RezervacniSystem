@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="">
+<html xmlns:th="http://www.thymeleaf.org" lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
             .page-break { page-break-after: always; }
         }
 
-        /* Drobná úprava pro mobily - zmenšení písma v tabulce pro lepší přehlednost */
+        /* Drobná úprava pro mobily */
         @media (max-width: 576px) {
             .table { font-size: 0.85rem; }
             h2 { font-size: 1.5rem; }
@@ -32,8 +32,13 @@
 
     <div th:each="jazyk : ${jazyky}" class="card mb-5 shadow-sm page-break">
         <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-            <h3 class="m-0 text-primary fs-4" th:text="${jazyk.nazevJazyka}">Jazyk</h3>
-            <span class="badge bg-secondary fs-6 text-nowrap">
+            <h3 class="m-0 text-primary fs-4">
+                <span th:text="${jazyk.nazevJazyka}">Němčina</span>
+                <small class="text-muted ms-2 fw-normal" th:text="'(Třída ' + ${jazyk.tridaUrceni} + ')'">(Třída A)</small>
+            </h3>
+
+            <span class="badge fs-6 text-nowrap"
+                  th:classappend="${jazyk.jePlno()} ? 'bg-danger' : 'bg-success'">
                 Stav: <span th:text="${jazyk.aktualniPocetRegistrovanych}"></span> / <span th:text="${jazyk.maxKapacita}"></span>
             </span>
         </div>
@@ -68,13 +73,14 @@
                             <form action="/admin/zrusit-registraci" method="post"
                                   onsubmit="return confirm('Opravdu chcete zrušit registraci tomuto studentovi?');">
                                 <input type="hidden" name="registraceId" th:value="${reg.registraceId}">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">❌</button>
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Zrušit registraci">❌</button>
                             </form>
                         </td>
                     </tr>
                     </tbody>
                 </table>
-            </div> </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>

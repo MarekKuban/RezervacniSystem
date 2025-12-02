@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Výběr jazyka</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <meta http-equiv="refresh" content="10">
+    <meta http-equiv="refresh" content="30">
 </head>
 <body class="bg-light">
 
@@ -15,7 +15,7 @@
         <img th:src="@{/img/oavm _logo_dlouhe.png}" alt="Logo školy" class="img-fluid py-2 col-md-6 col-sm-12">
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-5 bg-white p-4 rounded shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-4 rounded shadow-sm">
         <div>
             <h2 class="mb-0">Volba 2. cizího jazyka</h2>
             <p class="text-muted mb-0">
@@ -23,11 +23,23 @@
                 <strong class="d-block d-md-inline text-dark" th:text="${student.jmeno} + ' ' + ${student.prijmeni}">
                     Jan Novák
                 </strong>
+                <span class="badge bg-secondary ms-md-2" th:text="'Třída ' + ${student.trida}">Třída A</span>
             </p>
         </div>
         <a href="/logout" class="btn btn-outline-danger align-self-center">Odhlásit se</a>
     </div>
 
+    <div class="alert alert-warning shadow-sm d-flex flex-column flex-md-row justify-content-between align-items-center mb-5" role="alert">
+        <div>
+            <strong>⏳ Zbývající čas pro výběr:</strong>
+            <span id="countdown" class="fw-bold fs-5 ms-2 font-monospace">Načítám...</span>
+        </div>
+        <div class="text-muted small mt-2 mt-md-0 text-center text-md-end">
+            Registrace se uzavírá:<br>
+            <strong th:text="${#temporals.format(konecRegistrace, 'd. MMMM yyyy HH:mm')}">5. září 2026 20:00</strong>
+        </div>
+    </div>
+    <input type="hidden" id="konec-registrace-iso" th:value="${konecRegistrace}">
     <div th:if="${success}" class="alert alert-success shadow-sm" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-danger shadow-sm" th:text="${error}"></div>
 
@@ -51,7 +63,7 @@
     </div>
 
     <div th:if="${mojeVolba == null}">
-        <p class="lead text-center mb-4">Prosím, zvolte si jeden z dostupných jazyků. <br>
+        <p class="lead text-center mb-4">Prosím, zvolte si jeden z dostupných jazyků pro vaši třídu (<strong th:text="${student.trida}">A</strong>). <br>
             <small class="text-muted">Stránka se aktualizuje automaticky, sledujte volná místa.</small></p>
 
         <div class="row g-4">
@@ -97,6 +109,49 @@
     </div>
 
 </div>
+
+<script>
+    (function() {
+        // Načteme datum z hidden inputu
+        const isoInput = document.getElementById('konec-registrace-iso');
+
+        // Pokud input neexistuje nebo je prázdný, skript ukončíme
+        if (!isoInput || !isoInput.value) return;
+
+        const countDownDate = new Date(isoInput.value).getTime();
+
+        // Aktualizace každou sekundu
+        const x = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            const element = document.getElementById("countdown");
+            if (!element) return;
+
+            if (distance < 0) {
+                clearInterval(x);
+                element.innerHTML = "REGISTRACE UKONČENA";
+                element.classList.remove("text-dark");
+                element.classList.add("text-danger");
+
+                // Volitelné: Zneaktivnit tlačítka
+                const buttons = document.querySelectorAll('button[type="submit"]');
+                buttons.forEach(btn => btn.disabled = true);
+            } else {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                element.innerHTML =
+                    (days > 0 ? days + "d " : "") +
+                    (hours < 10 ? "0" + hours : hours) + "h " +
+                    (minutes < 10 ? "0" + minutes : minutes) + "m " +
+                    (seconds < 10 ? "0" + seconds : seconds) + "s";
+            }
+        }, 1000);
+    })();
+</script>
 
 </body>
 </html>

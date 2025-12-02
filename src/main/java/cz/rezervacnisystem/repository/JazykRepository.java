@@ -7,10 +7,14 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface JazykRepository extends JpaRepository<Jazyk, Integer> {
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT j FROM Jazyk j WHERE j.jazykId = :id")
     Optional<Jazyk> findByIdWithLock(@Param("id") Integer id);
+
+    List<Jazyk> findByTridaUrceni(String tridaUrceni);
 }
