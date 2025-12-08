@@ -12,83 +12,25 @@
     <div class="text-center mb-1">
         <img th:src="@{/img/oavm_logo.jpg}" alt="Logo školy" class="img-fluid py-2" style="height: 80px; width: auto;">
         <h3>Volba 2. cizího jazyka</h3>
-        <p class="text-muted">Příhlašte se pro vstup</p>
+        <p class="text-muted">Přihlašte se pro vstup</p>
     </div>
 
     <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}"></div>
 
     <form action="/login" method="post">
         <div class="mb-3">
-            <label class="form-label fw-bold">Jméno</label>
-            <input type="text" name="jmeno" class="form-control" placeholder="Např. Jan" required>
+            <label class="form-label fw-bold">Login</label>
+            <input type="text" name="login" class="form-control" placeholder="Váš login" required>
         </div>
 
         <div class="mb-3">
-            <label class="form-label fw-bold">Příjmení</label>
-            <input type="text" name="prijmeni" class="form-control" placeholder="Např. Novák" required>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-bold" for="rcInput">Rodné číslo</label>
-            <input type="text"
-                   id="rcInput"
-                   name="rodneCislo"
-                   class="form-control form-control-lg"
-                   placeholder="RRMMDD/XXXX"
-                   maxlength="11"
-                   required>
-            <div class="form-text">Lomítko se doplní automaticky.</div>
+            <label class="form-label fw-bold">Heslo</label>
+            <input type="password" name="heslo" class="form-control" placeholder="Vaše heslo" required>
         </div>
 
         <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Přihlásit se</button>
     </form>
 </div>
-
-<script>
-    const input = document.getElementById('rcInput');
-
-    input.addEventListener('input', function (e) {
-        // 1. Pokud uživatel zrovna maže (Backspace), nebudeme mu do toho sahat,
-        // jinak by se mu tam to lomítko vracelo a nemohl by ho smazat.
-        if (e.inputType === 'deleteContentBackward') {
-            return;
-        }
-
-        let value = input.value;
-
-        // 2. Získáme čistá čísla (odstraníme vše, co není číslo)
-        let numbers = value.replace(/\D/g, '');
-
-        // 3. Logika formátování
-        // Pokud máme více než 6 čísel, "natvrdo" zformátujeme na XXXXXX/YYYY
-        if (numbers.length > 6) {
-            input.value = numbers.slice(0, 6) + '/' + numbers.slice(6, 10);
-        }
-        // 4. Pokud uživatel napsal přesně 6 čísel a manuálně přidal lomítko
-        // tak mu to lomítko nesmažeme (předchozí skript by ho smazal).
-        else if (numbers.length === 6 && value.includes('/')) {
-            // Jen se ujistíme, že je lomítko na správném místě (za 6. číslem)
-            if (!value.startsWith(numbers.slice(0, 6) + '/')) {
-                input.value = numbers.slice(0, 6) + '/';
-            }
-            // Jinak neděláme nic a necháme tam to lomítko, co napsal uživatel.
-        }
-        // 5. Pokud tam uživatel píše písmena nebo znaky jinam než má
-        else {
-            // Povolíme jen čísla a jedno lomítko na 7. pozici
-            // (Tohle "čistí" vstup, kdyby tam někdo psal abecedu)
-            if (!/^\d{0,6}\/?\d{0,4}$/.test(value)) {
-                // Pokud vstup neodpovídá formátu (např. písmena), vrátíme tam jen čísla
-                // Pokud je čísel 6 a víc, přidáme lomítko
-                if (numbers.length >= 6) {
-                    input.value = numbers.slice(0, 6) + '/' + numbers.slice(6, 10);
-                } else {
-                    input.value = numbers;
-                }
-            }
-        }
-    });
-</script>
 
 </body>
 </html>

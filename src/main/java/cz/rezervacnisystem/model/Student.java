@@ -13,9 +13,6 @@ public class Student {
     @Column(name = "student_id")
     private Integer studentId;
 
-    @Column(name = "rodne_cislo", nullable = false, unique = true)
-    private String rodneCislo;
-
     @Column(nullable = false)
     private String jmeno;
 
@@ -24,4 +21,10 @@ public class Student {
 
     @Column(nullable = false)
     private String trida;
+
+    @Column(nullable = false, unique = true)
+    private String login;
+
+    @Column(nullable = false)
+    private String heslo;
 }

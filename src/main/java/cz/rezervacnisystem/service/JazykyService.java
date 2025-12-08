@@ -19,9 +19,8 @@ public class JazykyService {
     private final JazykRepository jazykRepository;
     private final RegistraceRepository registraceRepository;
 
-    // ČASOVÉ OMEZENÍ: Nastaveno od včerejška na 7 dní dopředu
     private static final LocalDateTime START_REGISTRACE = LocalDateTime.of(2025, 9, 1, 8, 0);
-    private static final LocalDateTime KONEC_REGISTRACE = LocalDateTime.of(2025, 12, 2, 20, 19);
+    private static final LocalDateTime KONEC_REGISTRACE = LocalDateTime.of(2025, 12, 5, 18, 40);
 
     public JazykyService(StudentRepository studentRepo, JazykRepository jazykRepo, RegistraceRepository registraceRepo) {
         this.studentRepository = studentRepo;
@@ -29,7 +28,6 @@ public class JazykyService {
         this.registraceRepository = registraceRepo;
     }
 
-    // --- NOVÁ METODA PRO KONTROLER (Bez ní by to spadlo) ---
     public List<Jazyk> ziskatJazykyProTridu(String trida) {
         return jazykRepository.findByTridaUrceni(trida);
     }
@@ -43,30 +41,20 @@ public class JazykyService {
         return registrace.isEmpty() ? null : registrace.get(0);
     }
 
-    public Student prihlasitStudenta(String rodneCislo, String zadaneJmeno, String zadanePrijmeni) {
-        // Ponechal jsem tvou logiku pro formátování RČ (to je super věc)
-        String cisteRC = rodneCislo.replaceAll("[^0-9]", "");
-        String formatovaneRC = rodneCislo;
-
-        if (cisteRC.length() == 10) {
-            formatovaneRC = cisteRC.substring(0, 6) + "/" + cisteRC.substring(6);
-        }
-
-        Student student = studentRepository.findByRodneCislo(formatovaneRC).orElse(null);
+    // --- ZMĚNA ZDE: Už jen Login a Heslo ---
+    public Student prihlasitStudenta(String login, String heslo) {
+        Student student = studentRepository.findByLogin(login).orElse(null);
 
         if (student == null) {
             return null;
         }
 
-        boolean jmenoSedi = student.getJmeno().trim().equalsIgnoreCase(zadaneJmeno.trim());
-        boolean prijmeniSedi = student.getPrijmeni().trim().equalsIgnoreCase(zadanePrijmeni.trim());
-
-        return (jmenoSedi && prijmeniSedi) ? student : null;
+        // Pokud heslo sedí, vracíme studenta, jinak null
+        return student.getHeslo().equals(heslo) ? student : null;
     }
 
     @Transactional
     public void vytvoritRegistraci(Integer studentId, Integer jazykId) throws Exception {
-        // 1. KONTROLA ČASU (Nové)
         if (LocalDateTime.now().isBefore(START_REGISTRACE)) {
             throw new Exception("Registrace ještě nebyla spuštěna.");
         }
@@ -79,7 +67,6 @@ public class JazykyService {
         Jazyk jazyk = jazykRepository.findByIdWithLock(jazykId)
                 .orElseThrow(() -> new Exception("Jazyk neexistuje"));
 
-        // 2. KONTROLA TŘÍDY (Nové - aby si někdo z A nezapsal jazyk pro B)
         if (!jazyk.getTridaUrceni().equals(student.getTrida())) {
             throw new Exception("Tento jazyk není určen pro vaši třídu (" + student.getTrida() + ").");
         }
@@ -104,7 +91,6 @@ public class JazykyService {
 
     @Transactional
     public void zrusitRegistraciStudenta(Student student) throws Exception {
-        // I rušení je omezeno časem
         if (LocalDateTime.now().isAfter(KONEC_REGISTRACE)) {
             throw new Exception("Registrace byla ukončena, změny již nejsou možné.");
         }

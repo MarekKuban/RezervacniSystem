@@ -10,8 +10,6 @@
             .no-print { display: none; }
             .page-break { page-break-after: always; }
         }
-
-        /* Drobná úprava pro mobily */
         @media (max-width: 576px) {
             .table { font-size: 0.85rem; }
             h2 { font-size: 1.5rem; }
@@ -55,7 +53,7 @@
                         <th style="width: 50px;">#</th>
                         <th>Příjmení</th>
                         <th>Jméno</th>
-                        <th>Rodné číslo</th>
+                        <th>Login</th>
                         <th class="text-end">Čas zápisu</th>
                         <th class="text-center" style="width: 100px;">Akce</th>
                     </tr>
@@ -65,7 +63,7 @@
                         <td class="fw-bold text-muted" th:text="${rowStat.count} + '.'">1.</td>
                         <td class="fw-bold" th:text="${reg.student.prijmeni}">Novák</td>
                         <td th:text="${reg.student.jmeno}">Jan</td>
-                        <td class="font-monospace" th:text="${reg.student.rodneCislo}">050101/1234</td>
+                        <td class="font-monospace" th:text="${reg.student.login}">novakj</td>
                         <td class="text-end text-muted small"
                             th:text="${#temporals.format(reg.datumRegistrace, 'dd.MM.yyyy HH:mm')}">
                         </td>

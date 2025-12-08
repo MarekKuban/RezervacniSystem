@@ -18,9 +18,10 @@ import java.util.List;
 public class JazykyController {
 
     private final JazykyService service;
-    private static final String ADMIN_RC = "000000/7350";
-    private static final String ADMIN_JMENO = "Admin";
-    private static final String ADMIN_PRIJMENI = "Admin";
+
+    // Admin údaje napevno
+    private static final String ADMIN_LOGIN = "admin";
+    private static final String ADMIN_HESLO = "admin123";
 
     public JazykyController(JazykyService service) {
         this.service = service;
@@ -33,16 +34,25 @@ public class JazykyController {
     }
 
     @PostMapping("/login")
-    public String processLogin(@RequestParam String jmeno, @RequestParam String prijmeni, @RequestParam String rodneCislo, HttpSession session, RedirectAttributes redirectAttributes) {
-        if (ADMIN_RC.equals(rodneCislo) && ADMIN_JMENO.equalsIgnoreCase(jmeno) && ADMIN_PRIJMENI.equalsIgnoreCase(prijmeni)) {
+    public String processLogin(@RequestParam String login,
+                               @RequestParam String heslo,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+
+        // 1. Kontrola Admina (Stačí Login + Heslo)
+        if (ADMIN_LOGIN.equals(login) && ADMIN_HESLO.equals(heslo)) {
             session.setAttribute("adminLogged", true);
             return "redirect:/admin/dashboard";
         }
-        Student student = service.prihlasitStudenta(rodneCislo, jmeno, prijmeni);
+
+        // 2. Kontrola Studenta (Login + Heslo)
+        Student student = service.prihlasitStudenta(login, heslo);
+
         if (student == null) {
-            redirectAttributes.addFlashAttribute("error", "Chyba přihlášení.");
+            redirectAttributes.addFlashAttribute("error", "Špatné jméno nebo heslo.");
             return "redirect:/";
         }
+
         session.setAttribute("prihlasenyStudent", student);
         return "redirect:/vyber";
     }
